@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Waste classification</title>
+    <style>
+      html, body, #container, #video, #canvas {
+        width: 100%;
+        height: 100%;
+      }
+      body {
+        margin: 0;
+      }
+      #video {
+        display: block;
+        transform: scaleX(-1);
+      }
+      #canvas {
+        position: absolute;
+        top: 0;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.1/palette.min.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <video id="video" autoplay></video>
+      <canvas id="canvas"></canvas>
+    </div>
+    <script>
+      const video = document.getElementById("video");
+      const container = document.getElementById("container");
+      const draw_canvas = document.getElementById("canvas");
+      const draw_context = draw_canvas.getContext("2d");
+      const capture_canvas = document.createElement("canvas");
+      const capture_context = capture_canvas.getContext("2d");
+      container.addEventListener("click", () => {
+        container.requestFullscreen();
+      });
+      video.addEventListener("loadedmetadata", () => {
+        capture_canvas.width = video.videoWidth;
+        capture_canvas.height = video.videoHeight;
+      });
+      function canvasWH() {
+        draw_canvas.width = container.offsetWidth;
+        draw_canvas.height = container.offsetHeight;
+      }
+      function scaleWH(vw, vh, ow, oh) {
+        if (vw / vh < ow / oh) {
+          return [vw * oh / vh, oh];
+        } else {
+          return [ow, vh * ow / vw];
+        }
+      }
+      function draw(data) {
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
+        const ow = video.offsetWidth;
+        const oh = video.offsetHeight;
+        const [svw, svh] = scaleWH(vw, vh, ow, oh);
+        const colors = palette("mpn65", data.length).map((color) => `#${color}`);
+        draw_context.clearRect(0, 0, draw_canvas.width, draw_canvas.height);
+        draw_context.lineWidth = 3;
+        draw_context.font = "1em sans-serif";
+        draw_context.textAlign = "center";
+        draw_context.textBaseline = "middle";
+        for (let i = 0; i < data.length; ++i)  {
+          const object = data[i];
+          let [x, y, w, h] = object["rect"];
+          x = x / vw * svw + (ow - svw) / 2 + draw_context.lineWidth / 2;
+          w = w / vw * svw - draw_context.lineWidth;
+          y = y / vh * svh + (oh - svh) / 2 + draw_context.lineWidth / 2;
+          h = h / vh * svh - draw_context.lineWidth;
+          draw_context.fillStyle = colors[i];
+          draw_context.strokeStyle = colors[i];
+          draw_context.strokeRect(x, y, w, h);
+          draw_context.fillText(object["label"], x + w / 2, y + h / 2, w - 3 * draw_context.lineWidth);
+        }
+      }
+      function classify(blob) {
+        fetch("/classify/", {
+          method: "POST",
+          body: blob,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            draw(data);
+            setTimeout(capture, 0);
+          });
+      }
+      function capture() {
+        capture_context.drawImage(video, 0, 0, capture_canvas.width, capture_canvas.height);
+        capture_canvas.toBlob(classify, "image/jpeg", 0.9);
+      }
+      const observer = new ResizeObserver(canvasWH);
+      observer.observe(container);
+      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        video.srcObject = stream;
+      });
+      capture();
+    </script>
+  </body>
+</html>
