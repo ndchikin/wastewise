@@ -86,7 +86,7 @@
           .then((response) => response.json())
           .then((data) => {
             draw(data);
-            setTimeout(capture, 0);
+            capture();
           });
       }
       function capture() {
