@@ -10,11 +10,14 @@ from transformers import pipeline
 app = FastAPI()
 models = {}
 object_labels = [
-    "Face",
+    "Waste Item",
 ]
 class_labels = [
-    "Male",
-    "Female",
+    "Organic Waste",
+    "Plastic Waste",
+    "Glass Waste",
+    "Paper Waste",
+    "Metal Waste",
 ]
 
 
