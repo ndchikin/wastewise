@@ -14,6 +14,7 @@
       }
       #video {
         display: block;
+        transform: scaleX(-1);
       }
       #canvas {
         position: absolute;
@@ -66,11 +67,11 @@
         draw_context.textBaseline = "middle";
         for (let i = 0; i < data.length; ++i)  {
           const object = data[i];
-          let [x, y, w, h] = object["rect"];
-          x = x / vw * svw + (ow - svw) / 2 + draw_context.lineWidth / 2;
-          w = w / vw * svw - draw_context.lineWidth;
-          y = y / vh * svh + (oh - svh) / 2 + draw_context.lineWidth / 2;
-          h = h / vh * svh - draw_context.lineWidth;
+          let [xmin, ymin, xmax, ymax] = object["rect"];
+          x = xmin / vw * svw + (ow - svw) / 2 + draw_context.lineWidth / 2;
+          w = (xmax - xmin) / vw * svw - draw_context.lineWidth;
+          y = ymin / vh * svh + (oh - svh) / 2 + draw_context.lineWidth / 2;
+          h = (ymax - ymin) / vh * svh - draw_context.lineWidth;
           draw_context.fillStyle = colors[i];
           draw_context.strokeStyle = colors[i];
           draw_context.strokeRect(x, y, w, h);
@@ -89,6 +90,7 @@
           });
       }
       function capture() {
+        capture_context.setTransform(-1, 0, 0, 1, capture_canvas.width, 0);
         capture_context.drawImage(video, 0, 0, capture_canvas.width, capture_canvas.height);
         capture_canvas.toBlob(classify, "image/jpeg", 0.9);
       }
