@@ -12,9 +12,11 @@
       body {
         margin: 0;
       }
+      #container {
+        transform: scaleX(-1);
+      }
       #video {
         display: block;
-        transform: scaleX(-1);
       }
       #canvas {
         position: absolute;
@@ -90,7 +92,6 @@
           });
       }
       function capture() {
-        capture_context.setTransform(-1, 0, 0, 1, capture_canvas.width, 0);
         capture_context.drawImage(video, 0, 0, capture_canvas.width, capture_canvas.height);
         capture_canvas.toBlob(classify, "image/jpeg", 0.9);
       }
