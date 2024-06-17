@@ -1,0 +1,14 @@
+http:
+  routers:
+    gateway:
+      rule: Host("sil2024.westeurope.azurecontainer.io")
+      service: gateway
+      entryPoints:
+        - https
+      tls:
+        certResolver: myresolver
+  services:
+    gateway:
+      loadBalancer:
+        servers:
+          - url: http://127.0.0.1:8080

@@ -1,0 +1,19 @@
+entryPoints:
+  http:
+    address: :80
+    http:
+      redirections:
+        entryPoint:
+          to: https
+  https:
+    address: :443
+
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: nikolajchikin@gmail.com
+      tlsChallenge: {}
+
+providers:
+  file:
+    filename: dynamic.yml

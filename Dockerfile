@@ -11,4 +11,4 @@ COPY models/yolov8m.pt .
 COPY backend/main.py .
 COPY frontend/index.html static/
 
-ENTRYPOINT ["fastapi", "run", "--port", "80", "--workers", "4"]
+ENTRYPOINT ["fastapi", "run", "--host", "127.0.0.1", "--port", "8080", "--workers", "4"]
