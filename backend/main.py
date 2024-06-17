@@ -17,7 +17,7 @@ def startup_event():
 
 
 @app.post("/classify/")
-async def classify(data: Annotated[bytes, Body()]):
+def classify(data: Annotated[bytes, Body()]):
     response = []
     pred = models["detector"].predict(Image.open(io.BytesIO(data)))[0]
     boxes = pred.boxes
