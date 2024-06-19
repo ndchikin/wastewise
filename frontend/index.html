@@ -24,7 +24,7 @@
   </head>
   <body>
     <div id="container">
-      <video id="video" autoplay></video>
+      <video id="video" autoplay playsinline muted></video>
       <canvas id="canvas"></canvas>
     </div>
     <script>
@@ -94,7 +94,7 @@
       }
       const observer = new ResizeObserver(canvasWH);
       observer.observe(container);
-      navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment"} }).then((stream) => {
         video.srcObject = stream;
       });
       capture();
